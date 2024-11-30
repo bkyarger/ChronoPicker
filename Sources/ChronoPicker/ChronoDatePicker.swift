@@ -21,6 +21,8 @@ public struct ChronoDatePicker: View {
     private let dateDisabled: ((Date) -> Bool)?
     private let weekdaySymbols: [String]
     
+    
+    
     public init(
         _ selectedDate: Binding<Date?>,
         calendar: Calendar = Calendar.current,
@@ -56,21 +58,23 @@ public struct ChronoDatePicker: View {
                 
                 Spacer()
                 
-                // MARK: Navigaion
-                Group {
-                    Button(action: {
-                        previousMonth()
-                    }) {
-                        Image(systemName: "chevron.left")
+                if !yearMonthSelectionOpen {
+                    // MARK: Navigaion
+                    Group {
+                        Button(action: {
+                            back()
+                        }) {
+                            Image(systemName: "chevron.left")
+                        }
+                        
+                        Button(action: {
+                            next()
+                        }) {
+                            Image(systemName: "chevron.right")
+                        }
                     }
-                    
-                    Button(action: {
-                        nextMonth()
-                    }) {
-                        Image(systemName: "chevron.right")
-                    }
+                    .font(.title2)
                 }
-                .font(.title2)
             }
             .padding()
             
@@ -97,27 +101,14 @@ public struct ChronoDatePicker: View {
                             }
                         }
                         
-                        // MARK: Calendar dates
-
-                        #if os(iOS) || os(tvOS) || os(watchOS)
-                            TabView {
-                                ForEach(-1...1) { index in
-                                    let month = calendar.date(byAdding: .month, value: 1, to: currentMonth)!
-                                    renderCalendarDates(for: month)
-                                        .tag(index)
-                                }
-                            }
-                            .tabViewStyle(.page)
-                        
-                        #else
-                            renderCalendarDates(for: currentMonth)
-                        #endif
+                        renderCalendarDates(for: currentMonth)
                     }
                 }
             }
         }
     }
     
+    // MARK: Calendar dates
     private func renderCalendarDates(for month: Date) -> some View {
         Group {
             let daysInMonth = calendar.datesInMonth(for: month)
@@ -146,15 +137,16 @@ public struct ChronoDatePicker: View {
                     .disabled(disabled)
                 }
             }
+            
         }
     }
     
     // MARK: Helpers
     
-    private func nextMonth() {
+    private func next() {
         currentMonth = calendar.date(byAdding: .month, value: 1, to: currentMonth)!
     }
-    private func previousMonth() {
+    private func back() {
         currentMonth = calendar.date(byAdding: .month, value: -1, to: currentMonth)!
     }
     
