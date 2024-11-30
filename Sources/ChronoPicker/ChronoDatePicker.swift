@@ -21,8 +21,6 @@ public struct ChronoDatePicker: View {
     private let dateDisabled: ((Date) -> Bool)?
     private let weekdaySymbols: [String]
     
-    
-    
     public init(
         _ selectedDate: Binding<Date?>,
         calendar: Calendar = Calendar.current,
@@ -101,43 +99,15 @@ public struct ChronoDatePicker: View {
                             }
                         }
                         
-                        renderCalendarDates(for: currentMonth)
+                        ChronoCalendar(
+                            selectedDate: $selectedDate,
+                            month: currentMonth,
+                            calendar: calendar,
+                            dateDisabled: dateDisabled
+                        )
                     }
                 }
             }
-        }
-    }
-    
-    // MARK: Calendar dates
-    private func renderCalendarDates(for month: Date) -> some View {
-        Group {
-            let daysInMonth = calendar.datesInMonth(for: month)
-            
-            let firstWeekday = calendar.component(.weekday, from: month)
-            let padding = (firstWeekday - calendar.firstWeekday + 7) % 7
-            
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7)) {
-                ForEach(0..<padding, id: \.self) { _ in
-                    Text("")
-                        .frame(maxWidth: .infinity)
-                }
-                
-                ForEach(daysInMonth, id: \.self) { date in
-                    let selected = isDateSelected(date: date)
-                    let disabled = isDateDisabled(date: date)
-                    
-                    // MARK: Date render
-                    ChronoPickerDateView_Default(date: date, calendar: calendar, selected: selected) {
-                        if selected {
-                            selectedDate = nil
-                        } else {
-                            selectedDate = date
-                        }
-                    }
-                    .disabled(disabled)
-                }
-            }
-            
         }
     }
     
@@ -148,20 +118,6 @@ public struct ChronoDatePicker: View {
     }
     private func back() {
         currentMonth = calendar.date(byAdding: .month, value: -1, to: currentMonth)!
-    }
-    
-    private func isDateDisabled(date: Date) -> Bool {
-        guard let dateDisabled else {
-            return false
-        }
-        return dateDisabled(date)
-    }
-    
-    private func isDateSelected(date: Date) -> Bool {
-        if let selectedDate = selectedDate {
-            return calendar.datesAreEqual(date1: date, date2: selectedDate)
-        }
-        return false
     }
     
     private func monthYearString(for date: Date) -> String {
