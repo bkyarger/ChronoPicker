@@ -19,7 +19,6 @@ public struct ChronoDatePicker: View {
     @Binding var selectedDate: Date?
     private let calendar: Calendar
     private let dateDisabled: ((Date) -> Bool)?
-    private let weekdaySymbols: [String]
     
     public init(
         _ selectedDate: Binding<Date?>,
@@ -28,7 +27,6 @@ public struct ChronoDatePicker: View {
     ) {
         self._selectedDate = selectedDate
         self.calendar = calendar
-        self.weekdaySymbols = calendar.weekDaysSorted
         self.dateDisabled = dateDisabled
         
         let startOfMonth = calendar.startOfMonth(for: selectedDate.wrappedValue ?? Date())
@@ -90,15 +88,9 @@ public struct ChronoDatePicker: View {
                 } else {
                     VStack {
                         // MARK: Week days
-                        HStack {
-                            ForEach(weekdaySymbols, id: \.self) { weekdaySymbol in
-                                Text(weekdaySymbol)
-                                    .foregroundStyle(.secondary)
-                                    .frame(maxWidth: .infinity)
-                                    .font(.headline)
-                            }
-                        }
+                        WeekdayHeader(calendar: calendar)
                         
+                        // MARK: Calendar
                         ChronoCalendar(
                             selectedDate: $selectedDate,
                             month: currentMonth,
@@ -134,7 +126,7 @@ extension ChronoDatePicker {
         calendar: Calendar = Calendar.current,
         in range: Range<Date>
     ) {
-        self.init(selectedDate, calendar: calendar, dateDisabled: { date in range.contains(date) })
+        self.init(selectedDate, calendar: calendar, dateDisabled: { date in !range.contains(date) })
     }
     
     public init(
@@ -142,7 +134,7 @@ extension ChronoDatePicker {
         calendar: Calendar = Calendar.current,
         in range: PartialRangeFrom<Date>
     ) {
-        self.init(selectedDate, calendar: calendar, dateDisabled: { date in range.contains(date) })
+        self.init(selectedDate, calendar: calendar, dateDisabled: { date in !range.contains(date) })
     }
     
     public init(
@@ -150,7 +142,7 @@ extension ChronoDatePicker {
         calendar: Calendar = Calendar.current,
         in range: PartialRangeUpTo<Date>
     ) {
-        self.init(selectedDate, calendar: calendar, dateDisabled: { date in range.contains(date) })
+        self.init(selectedDate, calendar: calendar, dateDisabled: { date in !range.contains(date) })
     }
     
     public init(
@@ -158,7 +150,7 @@ extension ChronoDatePicker {
         calendar: Calendar = Calendar.current,
         in range: ClosedRange<Date>
     ) {
-        self.init(selectedDate, calendar: calendar, dateDisabled: { date in range.contains(date) })
+        self.init(selectedDate, calendar: calendar, dateDisabled: { date in !range.contains(date) })
     }
 }
 
@@ -198,8 +190,7 @@ private struct ChronoPickerPreview: View {
     }
 }
 
-#Preview("Sunday first day of week") {
-    
+#Preview("sunday first of the week") {
     var europeanCalendar: Calendar {
         var calendar = Calendar.current
         calendar.firstWeekday = 1

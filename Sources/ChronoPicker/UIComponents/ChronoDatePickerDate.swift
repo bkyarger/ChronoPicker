@@ -54,7 +54,7 @@ struct ChronoPickerDateView_Default: ChronoPickerDateView {
 }
 
 #Preview {
-    VStack {
+    HStack {
         ChronoPickerDateView_Default(date: Date(), calendar: Calendar.current, selected: false, onClick: {
             print("selected date")
         })
