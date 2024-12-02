@@ -19,6 +19,7 @@ public struct ChronoDatePicker: View {
     @Binding var selectedDate: Date?
     private let calendar: Calendar
     private let dateDisabled: ((Date) -> Bool)?
+
     
     public init(
         _ selectedDate: Binding<Date?>,
@@ -35,7 +36,6 @@ public struct ChronoDatePicker: View {
     
     public var body: some View {
         VStack {
-            
             // MARK: Header
             HStack {
                 HStack {
@@ -91,12 +91,24 @@ public struct ChronoDatePicker: View {
                         WeekdayHeader(calendar: calendar)
                         
                         // MARK: Calendar
-                        ChronoCalendar(
-                            selectedDate: $selectedDate,
+                        MonthView(
+                            $selectedDate,
                             month: currentMonth,
                             calendar: calendar,
                             dateDisabled: dateDisabled
-                        )
+                        ) { date, selected in
+                            ChronoPickerDateView_Default(
+                                date: date,
+                                calendar: calendar,
+                                selected: selected
+                            ) {
+                                if selected {
+                                    selectedDate = nil
+                                } else {
+                                    selectedDate = date
+                                }
+                            }
+                        }
                     }
                 }
             }

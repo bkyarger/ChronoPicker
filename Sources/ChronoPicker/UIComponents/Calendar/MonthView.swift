@@ -1,5 +1,5 @@
 //
-//  ChronoCalendar.swift
+//  DatePicker.swift
 //  ChronoPicker
 //
 //  Created by Gerald Mahlknecht on 30.11.24.
@@ -7,12 +7,28 @@
 
 import SwiftUI
 
-struct ChronoCalendar: View {
+struct MonthView<DateView: View>: View {
     
-    @Binding var selectedDate: Date?
-    let month: Date
-    var calendar: Calendar = Calendar.current
-    let dateDisabled: ((Date) -> Bool)?
+    @Binding private var selectedDate: Date?
+    private let month: Date
+    private let calendar: Calendar
+    private let dateDisabled: ((Date) -> Bool)?
+    
+    private let dateView: (_ date: Date, _ selected: Bool) -> DateView
+    
+    init(
+        _ selectedDate: Binding<Date?>,
+        month: Date,
+        calendar: Calendar = Calendar.current,
+        dateDisabled: ((Date) -> Bool)? = nil,
+        @ViewBuilder dateView: @escaping (_ date: Date, _ selected: Bool) -> DateView
+    ) {
+        _selectedDate = selectedDate
+        self.month = month
+        self.calendar = calendar
+        self.dateDisabled = dateDisabled
+        self.dateView = dateView
+    }
 
     var body: some View {
         let daysInMonth = calendar.datesInMonth(for: month)
@@ -31,13 +47,10 @@ struct ChronoCalendar: View {
                 let disabled = isDateDisabled(date: date)
                 
                 // MARK: Date render
-                ChronoPickerDateView_Default(date: date, calendar: calendar, selected: selected) {
-                    if selected {
-                        selectedDate = nil
-                    } else {
-                        selectedDate = date
-                    }
-                }
+                dateView(
+                    date,
+                    selected
+                )
                 .disabled(disabled)
             }
         }
