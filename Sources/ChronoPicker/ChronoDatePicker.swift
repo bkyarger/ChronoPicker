@@ -72,9 +72,6 @@ public struct ChronoDatePicker: View {
                         }
                     }
                     .font(.title2)
-                    .transaction { transaction in
-                        transaction.animation = nil
-                    }
                 }
             }
             .padding()

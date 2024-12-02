@@ -13,7 +13,26 @@ struct ContentView: View {
     @State private var selectedDate: Date? = nil
     
     var body: some View {
-        ChronoDatePicker($selectedDate)
+        NavigationStack {
+            List {
+                NavigationLink {
+                    BasicExample()
+                } label: {
+                    Text("Basic Usage")
+                }
+                NavigationLink {
+                    DisabledDatesExample()
+                } label: {
+                    Text("Disabled Dates")
+                }
+                NavigationLink {
+                    AdvancedExample()
+                } label: {
+                    Text("Advanced Examples")
+                }
+            }
+            .navigationTitle("ChronoPicker Examples")
+        }
     }
 }
 
