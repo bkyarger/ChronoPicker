@@ -68,30 +68,3 @@ struct ChronoPickerDateView_Default: ChronoPickerDateView {
             }
     }
 }
-
-// TODO: Create preview matrix
-#Preview {
-    let today = Date()
-    let calendar = Calendar.current
-    let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
-    
-    VStack {
-        ChronoPickerDateView_Default(date: yesterday, calendar: calendar, selected: false, onClick: {
-            print("selected date")
-        })
-        ChronoPickerDateView_Default(date: yesterday, calendar: calendar, selected: true, onClick: {
-            print("selected date")
-        })
-        ChronoPickerDateView_Default(date: yesterday, calendar: calendar, selected: false, onClick: {
-            print("selected date")
-        })
-        .disabled(true)
-        ChronoPickerDateView_Default(date: today, calendar: calendar, selected: false, adjacent: true, onClick: {
-            print("selected date")
-        })
-        ChronoPickerDateView_Default(date: yesterday, calendar: calendar, selected: false, adjacent: true, onClick: {
-            print("selected date")
-        })
-    }
-    .frame(maxWidth: 40)
-}
