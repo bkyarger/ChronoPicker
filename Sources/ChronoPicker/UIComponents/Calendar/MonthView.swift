@@ -10,23 +10,26 @@ import SwiftUI
 struct MonthView<DateView: View>: View {
     
     @Binding private var selectedDate: Date?
-    private let month: Date
+    private var month: Date
     private let calendar: Calendar
     private let dateDisabled: ((Date) -> Bool)?
+    private let showAdjacentMonthDays: Bool
     
-    private let dateView: (_ date: Date, _ selected: Bool) -> DateView
+    private let dateView: (_ date: Date, _ selected: Bool, _ adjacent: Bool) -> DateView
     
     init(
         _ selectedDate: Binding<Date?>,
         month: Date,
         calendar: Calendar = Calendar.current,
         dateDisabled: ((Date) -> Bool)? = nil,
-        @ViewBuilder dateView: @escaping (_ date: Date, _ selected: Bool) -> DateView
+        showAdjacentMonthDays: Bool = false,
+        @ViewBuilder dateView: @escaping (_ date: Date, _ selected: Bool, _ adjacent: Bool) -> DateView
     ) {
         _selectedDate = selectedDate
         self.month = month
         self.calendar = calendar
         self.dateDisabled = dateDisabled
+        self.showAdjacentMonthDays = showAdjacentMonthDays
         self.dateView = dateView
     }
 
@@ -34,12 +37,25 @@ struct MonthView<DateView: View>: View {
         let daysInMonth = calendar.datesInMonth(for: month)
         
         let firstWeekday = calendar.component(.weekday, from: month)
-        let padding = (firstWeekday - calendar.firstWeekday + 7) % 7
+        let prePadding = (firstWeekday - calendar.firstWeekday + 7) % 7
         
         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7)) {
-            ForEach(0..<padding, id: \.self) { _ in
-                Text("")
-                    .frame(maxWidth: .infinity)
+            
+            if showAdjacentMonthDays {
+                let daysInPreviousMonth = calendar.datesInMonth(for: calendar.date(byAdding: .month, value: -1, to: month)!)
+                
+                let adjacentMonthDays = Array(daysInPreviousMonth.suffix(prePadding))
+                
+                ForEach(adjacentMonthDays, id: \.self) { date in
+                    let selected = isDateSelected(date: date)
+
+                    dateView(date, selected, true)
+                }
+            } else {
+                ForEach(0..<prePadding, id: \.self) { _ in
+                    Text("")
+                        .frame(maxWidth: .infinity)
+                }
             }
             
             ForEach(daysInMonth, id: \.self) { date in
@@ -49,10 +65,43 @@ struct MonthView<DateView: View>: View {
                 // MARK: Date render
                 dateView(
                     date,
-                    selected
+                    selected,
+                    false
                 )
                 .disabled(disabled)
             }
+            
+            if showAdjacentMonthDays {
+                let trailingDates = trailingAdjacentDates(for: month)
+
+                ForEach(trailingDates, id: \.self) { date in
+                    let selected = isDateSelected(date: date)
+
+                    dateView(date, selected, true)
+                }
+            }
+        }
+    }
+    
+    private func trailingAdjacentDates(for date: Date) -> [Date] {
+        guard let range = calendar.range(of: .day, in: .month, for: date) else { return [] }
+        let numberOfDaysInMonth = range.count
+        
+        let firstWeekday = calendar.firstWeekday
+        
+        guard let firstDayOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: date)) else {
+            return [] }
+        let lastDayOfMonth = calendar.date(byAdding: .day, value: numberOfDaysInMonth - 1, to: firstDayOfMonth)!
+        
+        let lastDayWeekday = (calendar.component(.weekday, from: lastDayOfMonth) - firstWeekday + 7) % 7
+        
+        let trailingDays = (6 - lastDayWeekday) % 7
+        
+        guard let firstDayOfNextMonth = calendar.date(byAdding: .month, value: 1, to: firstDayOfMonth) else {
+            return [] }
+                
+        return (0..<trailingDays).compactMap {
+            calendar.date(byAdding: .day, value: $0, to: firstDayOfNextMonth)
         }
     }
     
@@ -69,4 +118,42 @@ struct MonthView<DateView: View>: View {
         }
         return false
     }
+}
+
+private struct MonthViewPreview: View {
+    
+    @State private var selectedDate: Date? = nil
+    var calendar = Calendar.current
+    var dateDisabled: ((Date) -> Bool)? = nil
+    var showAdjacentMonthDays: Bool = false
+    
+    var body: some View {
+        VStack {
+            ChronoDatePicker($selectedDate, calendar: calendar, dateDisabled: dateDisabled, showAdjacentMonthDays: showAdjacentMonthDays)
+                .frame(maxWidth: .infinity)
+            
+            if let selectedDate = selectedDate {
+                Text("Selected Date: \(selectedDate, formatter: dateFormatter)")
+            } else {
+                Text("No date selected")
+            }
+        }
+        .padding()
+    }
+    
+    private var dateFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        return formatter
+    }
+}
+
+#Preview("showAdjacentMonthDays") {
+    let today = Date()
+    MonthViewPreview(showAdjacentMonthDays: true)
+}
+
+#Preview("don't showAdjacentMonthDays") {
+    let today = Date()
+    MonthViewPreview(showAdjacentMonthDays: false)
 }

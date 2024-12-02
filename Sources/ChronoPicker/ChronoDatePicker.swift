@@ -19,16 +19,18 @@ public struct ChronoDatePicker: View {
     @Binding var selectedDate: Date?
     private let calendar: Calendar
     private let dateDisabled: ((Date) -> Bool)?
-
+    private let showAdjacentMonthDays: Bool
     
     public init(
         _ selectedDate: Binding<Date?>,
         calendar: Calendar = Calendar.current,
-        dateDisabled: ((Date) -> Bool)? = nil
+        dateDisabled: ((Date) -> Bool)? = nil,
+        showAdjacentMonthDays: Bool = false
     ) {
         self._selectedDate = selectedDate
         self.calendar = calendar
         self.dateDisabled = dateDisabled
+        self.showAdjacentMonthDays = showAdjacentMonthDays
         
         let startOfMonth = calendar.startOfMonth(for: selectedDate.wrappedValue ?? Date())
         self._currentMonth = State(initialValue: startOfMonth)
@@ -95,12 +97,14 @@ public struct ChronoDatePicker: View {
                             $selectedDate,
                             month: currentMonth,
                             calendar: calendar,
-                            dateDisabled: dateDisabled
-                        ) { date, selected in
+                            dateDisabled: dateDisabled,
+                            showAdjacentMonthDays: showAdjacentMonthDays
+                        ) { date, selected, adjacent in
                             ChronoPickerDateView_Default(
                                 date: date,
                                 calendar: calendar,
-                                selected: selected
+                                selected: selected,
+                                adjacent: adjacent
                             ) {
                                 if selected {
                                     selectedDate = nil
@@ -136,33 +140,37 @@ extension ChronoDatePicker {
     public init(
         _ selectedDate: Binding<Date?>,
         calendar: Calendar = Calendar.current,
-        in range: Range<Date>
+        in range: Range<Date>,
+        showAdjacentMonthDays: Bool = false
     ) {
-        self.init(selectedDate, calendar: calendar, dateDisabled: { date in !range.contains(date) })
+        self.init(selectedDate, calendar: calendar, dateDisabled: { date in !range.contains(date) }, showAdjacentMonthDays: showAdjacentMonthDays)
     }
     
     public init(
         _ selectedDate: Binding<Date?>,
         calendar: Calendar = Calendar.current,
-        in range: PartialRangeFrom<Date>
+        in range: PartialRangeFrom<Date>,
+        showAdjacentMonthDays: Bool = false
     ) {
-        self.init(selectedDate, calendar: calendar, dateDisabled: { date in !range.contains(date) })
+        self.init(selectedDate, calendar: calendar, dateDisabled: { date in !range.contains(date) }, showAdjacentMonthDays: showAdjacentMonthDays)
     }
     
     public init(
         _ selectedDate: Binding<Date?>,
         calendar: Calendar = Calendar.current,
-        in range: PartialRangeUpTo<Date>
+        in range: PartialRangeUpTo<Date>,
+        showAdjacentMonthDays: Bool = false
     ) {
-        self.init(selectedDate, calendar: calendar, dateDisabled: { date in !range.contains(date) })
+        self.init(selectedDate, calendar: calendar, dateDisabled: { date in !range.contains(date) }, showAdjacentMonthDays: showAdjacentMonthDays)
     }
     
     public init(
         _ selectedDate: Binding<Date?>,
         calendar: Calendar = Calendar.current,
-        in range: ClosedRange<Date>
+        in range: ClosedRange<Date>,
+        showAdjacentMonthDays: Bool = false
     ) {
-        self.init(selectedDate, calendar: calendar, dateDisabled: { date in !range.contains(date) })
+        self.init(selectedDate, calendar: calendar, dateDisabled: { date in !range.contains(date) }, showAdjacentMonthDays: showAdjacentMonthDays)
     }
 }
 
@@ -173,10 +181,11 @@ private struct ChronoPickerPreview: View {
     @State private var selectedDate: Date? = nil
     var calendar = Calendar.current
     var dateDisabled: ((Date) -> Bool)? = nil
+    var showAdjacentMonthDays: Bool = false
     
     var body: some View {
         VStack {
-            ChronoDatePicker($selectedDate, calendar: calendar, dateDisabled: dateDisabled)
+            ChronoDatePicker($selectedDate, calendar: calendar, dateDisabled: dateDisabled, showAdjacentMonthDays: showAdjacentMonthDays)
                 .frame(maxWidth: .infinity)
             
             if let selectedDate = selectedDate {
@@ -197,7 +206,7 @@ private struct ChronoPickerPreview: View {
 
 #Preview("System calendar") {
     VStack {
-        ChronoPickerPreview(calendar: Calendar.current)
+        ChronoPickerPreview(calendar: Calendar.current, showAdjacentMonthDays: true)
         Spacer()
     }
 }
@@ -210,7 +219,7 @@ private struct ChronoPickerPreview: View {
         return calendar
     }
     
-    ChronoPickerPreview(calendar: europeanCalendar)
+    ChronoPickerPreview(calendar: europeanCalendar, showAdjacentMonthDays: true)
 }
 
 #Preview("Calendar Disabled") {
@@ -232,4 +241,8 @@ private struct ChronoPickerPreview: View {
     let yesterday = today.addingTimeInterval(-86400)
     
     ChronoDatePicker(Binding.constant(today), in: ..<yesterday)
+}
+
+#Preview("Show adjacent dates") {
+    ChronoPickerPreview(showAdjacentMonthDays: true)
 }

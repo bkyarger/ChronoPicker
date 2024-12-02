@@ -11,17 +11,22 @@ public protocol ChronoPickerDateView: View {
     var date: Date { get }
     var calendar: Calendar { get }
     var selected: Bool { get }
+    var adjacent: Bool { get }
     var onClick: () -> Void { get }
 }
 
 struct ChronoPickerDateView_Default: ChronoPickerDateView {
-    
     @Environment(\.isEnabled) var isEnabled
     
     let date: Date
     let calendar: Calendar
     let selected: Bool
+    var adjacent: Bool = false
     let onClick: () -> Void
+    
+    var isToday: Bool {
+        calendar.isDateInToday(date)
+    }
     
     var fontWeight: Font.Weight {
         if !isEnabled {
@@ -33,6 +38,17 @@ struct ChronoPickerDateView_Default: ChronoPickerDateView {
         return .medium
     }
     
+    var foregroundStyle: some ShapeStyle {
+        if !isEnabled {
+            return Color.gray
+        }
+        if adjacent {
+            return Color.gray
+        }
+        
+        return Color.primary
+    }
+    
     var body: some View {
         Text("\(calendar.component(.day, from: date))")
             .fontWeight(fontWeight)
@@ -40,7 +56,7 @@ struct ChronoPickerDateView_Default: ChronoPickerDateView {
             .frame(height: 40)
             .frame(width: 40)
             .background(selected ? Color.accentColor : Color.clear)
-            .foregroundStyle(!isEnabled ? Color.gray : Color.primary)
+            .foregroundStyle(foregroundStyle)
             .cornerRadius(20)
             .onTapGesture(perform: onClick)
             .modify { view in
@@ -53,18 +69,29 @@ struct ChronoPickerDateView_Default: ChronoPickerDateView {
     }
 }
 
+// TODO: Create preview matrix
 #Preview {
-    HStack {
-        ChronoPickerDateView_Default(date: Date(), calendar: Calendar.current, selected: false, onClick: {
+    let today = Date()
+    let calendar = Calendar.current
+    let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
+    
+    VStack {
+        ChronoPickerDateView_Default(date: yesterday, calendar: calendar, selected: false, onClick: {
             print("selected date")
         })
-        ChronoPickerDateView_Default(date: Date(), calendar: Calendar.current, selected: true, onClick: {
+        ChronoPickerDateView_Default(date: yesterday, calendar: calendar, selected: true, onClick: {
             print("selected date")
         })
-        ChronoPickerDateView_Default(date: Date(), calendar: Calendar.current, selected: false, onClick: {
+        ChronoPickerDateView_Default(date: yesterday, calendar: calendar, selected: false, onClick: {
             print("selected date")
         })
         .disabled(true)
+        ChronoPickerDateView_Default(date: today, calendar: calendar, selected: false, adjacent: true, onClick: {
+            print("selected date")
+        })
+        ChronoPickerDateView_Default(date: yesterday, calendar: calendar, selected: false, adjacent: true, onClick: {
+            print("selected date")
+        })
     }
     .frame(maxWidth: 40)
 }
