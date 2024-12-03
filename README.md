@@ -33,6 +33,18 @@ https://github.com/yourusername/ChronoPicker
 
 4. Select the version or branch you'd like to use.
 
+If you are using a Package.swift, add `ChronoPicker` as following:
+
+```swift
+let package = Package(
+  name: "Your Project Name",
+  dependencies: [
+    .package(url: "https://github.com/Kn3cht/ChronoPicker/releases", from: "<version>") // Checkout https://github.com/Kn3cht/ChronoPicker/releases
+  ],
+  ...
+)
+```
+
 ## Usage
 
 ChronoPicker is designed with a usage pattern inspired by SwiftUI's standard DatePicker. However, unlike the standard DatePicker, ChronoPicker allows the selected date to be nil. This makes it ideal for scenarios where selecting a date is optional, such as forms or filters.
@@ -90,3 +102,12 @@ ChronoDatePicker(
         // Your custom view
     })
 ```
+
+### More Examples
+
+Checkout further examples [here](https://github.com/Kn3cht/ChronoPicker/tree/main/Example/ChronoPickerExample).
+
+## Requirements
+
+- iOS 15.0
+- macOS 16.0

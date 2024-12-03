@@ -48,3 +48,11 @@ struct DisabledDatesExample: View {
         DisabledDatesExample()
     }
 }
+
+#Preview("Callback") {
+    VStack {
+        ChronoDatePicker(Binding.constant(Date()), dateDisabled: { Calendar.current.isDateInWeekend($0)
+        })
+        Spacer()
+    }
+}
