@@ -136,6 +136,7 @@ public struct ChronoDatePicker: View {
     }
 }
 
+// MARK: - Initializers
 extension ChronoDatePicker {
     public init(
         _ selectedDate: Binding<Date?>,

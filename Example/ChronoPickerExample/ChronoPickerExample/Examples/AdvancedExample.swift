@@ -12,7 +12,7 @@ struct AdvancedExample: View {
         
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(spacing: 40) {
                 VStack(alignment: .leading) {
                     Text("Localization")
                         .font(.title2)
