@@ -40,13 +40,14 @@ struct MonthView<DateView: View>: View {
             
             ForEach(dates, id: \.self) { optionalDate in
                 if let date = optionalDate {
+                    let adjacent = calendar.component(.month, from: date) != calendar.component(.month, from: month)
                     let selected = isDateSelected(date: date)
                     let disabled = isDateDisabled(date: date)
                     
                     dateView(
                         date,
                         selected,
-                        false
+                        adjacent
                     )
                     .disabled(disabled)
                 } else {

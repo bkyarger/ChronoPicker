@@ -153,35 +153,39 @@ extension ChronoDatePicker {
         _ selectedDate: Binding<Date?>,
         calendar: Calendar = Calendar.current,
         in range: Range<Date>,
-        showAdjacentMonthDays: Bool = false
+        showAdjacentMonthDays: Bool = false,
+        customDateView: ((_ date: Date, _ selected: Bool, _ adjacent: Bool) -> (AnyView))? = nil
     ) {
-        self.init(selectedDate, calendar: calendar, dateDisabled: { date in !range.contains(date) }, showAdjacentMonthDays: showAdjacentMonthDays)
+        self.init(selectedDate, calendar: calendar, dateDisabled: { date in !range.contains(date) }, showAdjacentMonthDays: showAdjacentMonthDays, customDateView: customDateView)
     }
     
     public init(
         _ selectedDate: Binding<Date?>,
         calendar: Calendar = Calendar.current,
         in range: PartialRangeFrom<Date>,
-        showAdjacentMonthDays: Bool = false
+        showAdjacentMonthDays: Bool = false,
+        customDateView: ((_ date: Date, _ selected: Bool, _ adjacent: Bool) -> (AnyView))? = nil
     ) {
-        self.init(selectedDate, calendar: calendar, dateDisabled: { date in !range.contains(date) }, showAdjacentMonthDays: showAdjacentMonthDays)
+        self.init(selectedDate, calendar: calendar, dateDisabled: { date in !range.contains(date) }, showAdjacentMonthDays: showAdjacentMonthDays, customDateView: customDateView)
     }
     
     public init(
         _ selectedDate: Binding<Date?>,
         calendar: Calendar = Calendar.current,
         in range: PartialRangeUpTo<Date>,
-        showAdjacentMonthDays: Bool = false
+        showAdjacentMonthDays: Bool = false,
+        customDateView: ((_ date: Date, _ selected: Bool, _ adjacent: Bool) -> (AnyView))? = nil
     ) {
-        self.init(selectedDate, calendar: calendar, dateDisabled: { date in !range.contains(date) }, showAdjacentMonthDays: showAdjacentMonthDays)
+        self.init(selectedDate, calendar: calendar, dateDisabled: { date in !range.contains(date) }, showAdjacentMonthDays: showAdjacentMonthDays, customDateView: customDateView)
     }
     
     public init(
         _ selectedDate: Binding<Date?>,
         calendar: Calendar = Calendar.current,
         in range: ClosedRange<Date>,
-        showAdjacentMonthDays: Bool = false
+        showAdjacentMonthDays: Bool = false,
+        customDateView: ((_ date: Date, _ selected: Bool, _ adjacent: Bool) -> (AnyView))? = nil
     ) {
-        self.init(selectedDate, calendar: calendar, dateDisabled: { date in !range.contains(date) }, showAdjacentMonthDays: showAdjacentMonthDays)
+        self.init(selectedDate, calendar: calendar, dateDisabled: { date in !range.contains(date) }, showAdjacentMonthDays: showAdjacentMonthDays, customDateView: customDateView)
     }
 }

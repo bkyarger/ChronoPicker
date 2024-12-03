@@ -50,6 +50,12 @@ struct AdvancedExample: View {
                 Divider()
                 
                 VStack(alignment: .leading) {
+                    Text("Custom date view")
+                        .font(.title2)
+                    Text("ChronoPicker allows you to provide your own custom date view.")
+                        .font(.footnote)
+                        .foregroundStyle(.gray)
+                    
                     CustomDateViewExample()
                 }
             }
@@ -160,6 +166,59 @@ private struct AdvancedUsageExample: View {
 
 private struct CustomDateViewExample: View {
     
+    private struct CustomDateView: View {
+        
+        @Environment(\.isEnabled) var isEnabled
+        
+        private let calendar: Calendar
+        
+        private let date: Date
+        private let selected: Bool
+        private let adjacent: Bool
+        
+        var background: Color {
+            if !isEnabled {
+                return .clear
+            }
+            
+            return selected ? .red : isWeekend ? .orange : adjacent ? .green : .gray
+        }
+
+        var foregroundStyle: some ShapeStyle {
+            if !isEnabled {
+                return .gray
+            }
+            return .black
+        }
+        
+        private var isWeekend: Bool {
+            Calendar.current.isDateInWeekend(date)
+        }
+        
+        init(
+            calendar: Calendar,
+            date: Date,
+            selected: Bool,
+            adjacent: Bool
+        ) {
+            self.calendar = calendar
+            self.date = date
+            self.selected = selected
+            self.adjacent = adjacent
+        }
+        
+        var body: some View {
+            Text("\(calendar.component(.day, from: date))")
+                .frame(height: 40)
+                .frame(width: 40)
+                .background(background)
+                .foregroundStyle(foregroundStyle)
+                .font(.headline)
+                .italic()
+                .cornerRadius(20)
+        }
+    }
+    
     @State private var selectedDate: Date? = Date()
     
     let calendar = Calendar.current
@@ -169,14 +228,10 @@ private struct CustomDateViewExample: View {
             ChronoDatePicker(
                 $selectedDate,
                 calendar: calendar,
-                customDateView: { date, selected, _ in
-                    let isWeekend = Calendar.current.isDateInWeekend(date)
-                    
-                    return AnyView(Text("\(calendar.component(.day, from: date))")
-                        .frame(height: 40)
-                        .frame(width: 40)
-                        .background(selected ? Color.red : isWeekend ? Color.orange : Color.clear)
-                        .cornerRadius(20))
+                in: ..<Date(),
+                showAdjacentMonthDays: true,
+                customDateView: { date, selected, adjacent in
+                    AnyView(CustomDateView(calendar: calendar, date: date, selected: selected, adjacent: adjacent))
                 })
         }
     }

@@ -7,14 +7,7 @@
 
 import SwiftUI
 
-public protocol ChronoPickerDateView: View {
-    var date: Date { get }
-    var calendar: Calendar { get }
-    var selected: Bool { get }
-    var adjacent: Bool { get }
-}
-
-struct ChronoPickerDateView_Default: ChronoPickerDateView {
+struct ChronoPickerDateView_Default: View {
     @Environment(\.isEnabled) var isEnabled
     
     let date: Date
