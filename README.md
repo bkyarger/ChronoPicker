@@ -1,5 +1,17 @@
 # ChronoPicker
 
+<p align="leading">
+    <img src="https://img.shields.io/badge/platform-iOS-blue.svg?style=flat" alt="Platforms" />
+    <img src="https://img.shields.io/badge/Swift-5-orange.svg" />
+    <a href="https://github.com/Kn3cht/ChronoPicker/blob/main/LICENSE"><img src="http://img.shields.io/badge/license-MIT-blue.svg?style=flat" alt="License: MIT" /></a>
+</p>
+
+[![SPM](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg)](https://github.com/apple/swift-package-manager)
+![Tests](https://github.com/Kn3cht/ChronoPicker/actions/workflows/Swift/badge.svg)
+[![Release](https://img.shields.io/github/v/release/Kn3cht/ChronoPicker)](https://github.com/Kn3cht/ChronoPicker/releases)
+
+
+
 ChronoPicker is a highly customizable and lightweight SwiftUI date picker component designed for seamless integration into your iOS and macOS applications. With support for optionals, custom disabled dates, theming, and localization, ChronoPicker provides the flexibility you need to create a tailored user experience.
 
 ## Features
@@ -47,11 +59,30 @@ This approach ensures maximum flexibility, making ChronoPicker suitable for any 
 
 
 ```swift 
+
+// Callback: Disable weekends
 ChronoPicker(
     $selectedDate,
     dateDisabled: { date in
-        // Disable weekends
         Calendar.current.isDateInWeekend(date)
     }
 )
+
+// Range: Disable all dates after today
+ChronoPicker(
+    $selectedDate,
+    in: ..<Date()
+)
+```
+
+### Custom Date Rendering
+
+ChronoPicker provides full flexibility for rendering dates by allowing you to override the default date view with your custom design. This feature is perfect for scenarios where you want to display additional information (e.g., events, availability) or apply unique styles to specific dates.
+
+```swift
+ChronoDatePicker(
+    $selectedDate,
+    customDateView: { date, selected, adjacent in
+        // Your custom view
+    })
 ```

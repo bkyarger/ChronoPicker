@@ -224,16 +224,14 @@ private struct CustomDateViewExample: View {
     let calendar = Calendar.current
 
     var body: some View {
-        VStack {
-            ChronoDatePicker(
-                $selectedDate,
-                calendar: calendar,
-                in: ..<Date(),
-                showAdjacentMonthDays: true,
-                customDateView: { date, selected, adjacent in
-                    AnyView(CustomDateView(calendar: calendar, date: date, selected: selected, adjacent: adjacent))
-                })
-        }
+        ChronoDatePicker(
+            $selectedDate,
+            calendar: calendar,
+            in: ..<Date(),
+            showAdjacentMonthDays: true,
+            customDateView: { date, selected, adjacent in
+                AnyView(CustomDateView(calendar: calendar, date: date, selected: selected, adjacent: adjacent))
+            })
     }
 }
 
