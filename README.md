@@ -8,7 +8,7 @@
 
 [![SPM](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg)](https://github.com/apple/swift-package-manager)
 ![Tests](https://github.com/Kn3cht/ChronoPicker/workflows/Swift/badge.svg)
-[![Release](https://img.shields.io/github/v/release/Kn3cht/ChronoPicker)](https://github.com/Kn3cht/ChronoPicker/releases/latest)
+[![Release](https://img.shields.io/github/v/release/Kn3cht/ChronoPicker)](https://img.shields.io/github/v/release/Kn3cht/ChronoPicker)
 
 
 

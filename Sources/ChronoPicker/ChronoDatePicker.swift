@@ -107,7 +107,7 @@ public struct ChronoDatePicker: View {
                                 if let customDateView {
                                     AnyView(customDateView(date, selected, adjacent))
                                 } else {
-                                    ChronoPickerDateView_Default(
+                                    ChronoDateView(
                                         date: date,
                                         calendar: calendar,
                                         selected: selected,

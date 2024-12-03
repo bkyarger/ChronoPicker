@@ -1,5 +1,5 @@
 //
-//  SwiftUIView.swift
+//  ChronoDateView.swift
 //  ChronoPicker
 //
 //  Created by Gerald Mahlknecht on 30.11.24.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ChronoPickerDateView_Default: View {
+struct ChronoDateView: View {
     @Environment(\.isEnabled) var isEnabled
     
     let date: Date
