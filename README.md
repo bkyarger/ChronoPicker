@@ -14,6 +14,8 @@
 
 ChronoPicker is a highly customizable and lightweight SwiftUI date picker component designed for seamless integration into your iOS and macOS applications. With support for optionals, custom disabled dates, theming, and localization, ChronoPicker provides the flexibility you need to create a tailored user experience.
 
+<img width="617" alt="image" src="https://github.com/user-attachments/assets/5ee0de1a-2a43-48ec-aaa9-2e6f92c71ccb">
+
 ## Features
 - 🛠 Custom Disabled Dates: Disable specific dates or ranges based on your business logic, perfect for blackout periods, holidays, or availability constraints.
 - 🎨 Customizability: Fully customize the appearance, including colors, fonts, and styles, to seamlessly match your app's design.
@@ -54,6 +56,8 @@ struct ContentView: View {
 ### Disabled Dates
 
 ChronoPicker's `dateDisabled` callback function offers unparalleled flexibility compared to traditional range-based disabling. While ranges are sufficient for basic use cases, the callback function allows you to define complex, dynamic rules for disabling dates.
+
+<img width="617" alt="image" src="https://github.com/user-attachments/assets/bb039d6b-6888-4588-bbd1-18edf3397494">
 
 This approach ensures maximum flexibility, making ChronoPicker suitable for any scheduling or availability-related scenario.
 
