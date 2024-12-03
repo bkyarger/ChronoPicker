@@ -12,7 +12,6 @@ public protocol ChronoPickerDateView: View {
     var calendar: Calendar { get }
     var selected: Bool { get }
     var adjacent: Bool { get }
-    var onClick: () -> Void { get }
 }
 
 struct ChronoPickerDateView_Default: ChronoPickerDateView {
@@ -22,7 +21,6 @@ struct ChronoPickerDateView_Default: ChronoPickerDateView {
     let calendar: Calendar
     let selected: Bool
     var adjacent: Bool = false
-    let onClick: () -> Void
     
     var isToday: Bool {
         calendar.isDateInToday(date)
@@ -58,7 +56,6 @@ struct ChronoPickerDateView_Default: ChronoPickerDateView {
             .background(selected ? Color.accentColor : Color.clear)
             .foregroundStyle(foregroundStyle)
             .cornerRadius(20)
-            .onTapGesture(perform: onClick)
             .modify { view in
                 if #available(iOS 16.0, *) {
                     view.strikethrough(!isEnabled)

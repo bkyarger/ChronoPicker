@@ -46,6 +46,12 @@ struct AdvancedExample: View {
                     
                     AdvancedUsageExample()
                 }
+                
+                Divider()
+                
+                VStack(alignment: .leading) {
+                    CustomDateViewExample()
+                }
             }
             .padding()
         }
@@ -148,6 +154,30 @@ private struct AdvancedUsageExample: View {
                 showAdjacentMonthDays: showAdjacentMonthDays
             )
             .disabled(calendarDisabled)
+        }
+    }
+}
+
+private struct CustomDateViewExample: View {
+    
+    @State private var selectedDate: Date? = Date()
+    
+    let calendar = Calendar.current
+
+    var body: some View {
+        VStack {
+            ChronoDatePicker(
+                $selectedDate,
+                calendar: calendar,
+                customDateView: { date, selected, _ in
+                    let isWeekend = Calendar.current.isDateInWeekend(date)
+                    
+                    return AnyView(Text("\(calendar.component(.day, from: date))")
+                        .frame(height: 40)
+                        .frame(width: 40)
+                        .background(selected ? Color.red : isWeekend ? Color.orange : Color.clear)
+                        .cornerRadius(20))
+                })
         }
     }
 }

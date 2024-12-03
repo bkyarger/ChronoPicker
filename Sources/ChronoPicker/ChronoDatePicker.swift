@@ -20,12 +20,14 @@ public struct ChronoDatePicker: View {
     private let calendar: Calendar
     private let dateDisabled: ((Date) -> Bool)?
     private let showAdjacentMonthDays: Bool
+    private let customDateView: ((_ date: Date, _ selected: Bool, _ adjacent: Bool) -> (AnyView))?
     
     public init(
         _ selectedDate: Binding<Date?>,
         calendar: Calendar = Calendar.current,
         dateDisabled: ((Date) -> Bool)? = nil,
-        showAdjacentMonthDays: Bool = false
+        showAdjacentMonthDays: Bool = false,
+        customDateView: ((_ date: Date, _ selected: Bool, _ adjacent: Bool) -> (AnyView))? = nil
     ) {
         self._selectedDate = selectedDate
         self.calendar = calendar
@@ -34,6 +36,7 @@ public struct ChronoDatePicker: View {
         
         let startOfMonth = calendar.startOfMonth(for: selectedDate.wrappedValue ?? Date())
         self._currentMonth = State(initialValue: startOfMonth)
+        self.customDateView = customDateView
     }
     
     public var body: some View {
@@ -100,18 +103,26 @@ public struct ChronoDatePicker: View {
                             dateDisabled: dateDisabled,
                             showAdjacentMonthDays: showAdjacentMonthDays
                         ) { date, selected, adjacent in
-                            ChronoPickerDateView_Default(
-                                date: date,
-                                calendar: calendar,
-                                selected: selected,
-                                adjacent: adjacent
-                            ) {
+                            Group {
+                                if let customDateView {
+                                    AnyView(customDateView(date, selected, adjacent))
+                                } else {
+                                    ChronoPickerDateView_Default(
+                                        date: date,
+                                        calendar: calendar,
+                                        selected: selected,
+                                        adjacent: adjacent
+                                    )
+                                }
+                            }
+                            .onTapGesture {
                                 if selected {
                                     selectedDate = nil
                                 } else {
                                     selectedDate = date
                                 }
                             }
+
                         }
                     }
                 }

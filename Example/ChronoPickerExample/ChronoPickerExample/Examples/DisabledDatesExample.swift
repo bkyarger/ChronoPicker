@@ -32,7 +32,8 @@ struct DisabledDatesExample: View {
                         .font(.footnote)
                         .foregroundStyle(.gray)
                     
-                    ChronoDatePicker($selectedDate, dateDisabled: { Calendar.current.isDateInWeekend($0) })
+                    ChronoDatePicker($selectedDate, dateDisabled: { Calendar.current.isDateInWeekend($0)
+                    })
                     
                 }
             }
