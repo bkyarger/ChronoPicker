@@ -46,7 +46,7 @@ struct ChronoDateView: View {
             .frame(maxWidth: .infinity)
             .frame(height: 40)
             .frame(width: 40)
-            .background(selected ? Color.accentColor : Color.clear)
+            .background(selected ? Color.accentColor.opacity(0.5) : Color.clear)
             .foregroundStyle(foregroundStyle)
             .cornerRadius(20)
             .modify { view in

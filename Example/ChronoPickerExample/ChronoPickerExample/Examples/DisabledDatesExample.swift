@@ -10,7 +10,7 @@ import ChronoPicker
 
 struct DisabledDatesExample: View {
     
-    @State private var selectedDate: Date? = nil
+    @State private var selectedDate: Date? = Date()
     
     var body: some View {
         ScrollView {
