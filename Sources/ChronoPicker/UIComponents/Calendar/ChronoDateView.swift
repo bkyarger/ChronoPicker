@@ -23,7 +23,7 @@ struct ChronoDateView: View {
         if !isEnabled {
             return .light
         }
-        if selected {
+        if selected || isToday {
             return .semibold
         }
         return .medium
@@ -35,6 +35,12 @@ struct ChronoDateView: View {
         }
         if adjacent {
             return Color.gray
+        }
+        if selected {
+            return Color.black
+        }
+        if isToday {
+            return Color.accentColor
         }
         
         return Color.primary
