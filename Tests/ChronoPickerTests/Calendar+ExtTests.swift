@@ -6,6 +6,8 @@ final class ChronoPickerTests: XCTestCase {
     
     let calendar = Calendar.current
     
+    let iso8601Calendar = Calendar(identifier: .iso8601)
+    
     // MARK: - Dates in month
     func testDatesInMonth() throws {
         let dateComponents = DateComponents(year: 2024, month: 11, day: 15)
@@ -107,61 +109,53 @@ final class ChronoPickerTests: XCTestCase {
     
     // MARK: - Date grid
     func testCalendarDatesWithoutAdjacentDays() {
-        var calendar = Calendar(identifier: .iso8601)
-        calendar.firstWeekday = 2 // ISO8601 defaults to Monday start
-        
-        let testDate = calendar.date(from: DateComponents(year: 2024, month: 11, day: 1))! // November 2024 with start on monday has 4 leading adjacent days and 1 trailing
+        let testDate = iso8601Calendar.date(from: DateComponents(year: 2024, month: 11, day: 1))! // November 2024 with start on monday has 4 leading adjacent days and 1 trailing
         let includeAdjacent = false
         
-        let dates = calendar.calendarDates(in: testDate, includeAdjacent: includeAdjacent)
+        let dates = iso8601Calendar.calendarDates(in: testDate, includeAdjacent: includeAdjacent)
         
         XCTAssertTrue(dates.prefix(4).allSatisfy { $0 == nil }, "Leading adjacent slots should be nil when includeAdjacent is false.")
         XCTAssertTrue(dates.suffix(1).allSatisfy { $0 == nil }, "Trailing adjacent slots should be nil when includeAdjacent is false.")
     }
     
     func testCalendarDatesWithAdjacentDays() {
-        var calendar = Calendar(identifier: .iso8601)
-        calendar.firstWeekday = 2 // ISO8601 defaults to Monday start
         
-        let testDate = calendar.date(from: DateComponents(year: 2024, month: 11, day: 1))! // November 2024 with start on monday has 4 leading adjacent days and 1 trailing
+        let testDate = iso8601Calendar.date(from: DateComponents(year: 2024, month: 11, day: 1))! // November 2024 with start on monday has 4 leading adjacent days and 1 trailing
         let includeAdjacent = true
         
-        let dates = calendar.calendarDates(in: testDate, includeAdjacent: includeAdjacent)
+        let dates = iso8601Calendar.calendarDates(in: testDate, includeAdjacent: includeAdjacent)
         
         XCTAssertTrue(dates.allSatisfy { $0 != nil }, "No date must be nil when include adjacent is true.")
         
         let leadingDates = dates.prefix(4).compactMap { $0 }
-        XCTAssertTrue(leadingDates.allSatisfy { calendar.component(.month, from: $0) == 10 }, "Leading adjacent dates should belong to October.")
+        XCTAssertTrue(leadingDates.allSatisfy { iso8601Calendar.component(.month, from: $0) == 10 }, "Leading adjacent dates should belong to October.")
         
         let trailingDates = dates.suffix(1).compactMap { $0 }
-        XCTAssertTrue(trailingDates.allSatisfy { calendar.component(.month, from: $0) == 12 }, "Trailing adjacent dates should belong to December.")
+        XCTAssertTrue(trailingDates.allSatisfy { iso8601Calendar.component(.month, from: $0) == 12 }, "Trailing adjacent dates should belong to December.")
     }
     
     func testLeadingAdjacentDates() {
-        var calendar = Calendar(identifier: .iso8601)
-        calendar.firstWeekday = 2 // ISO8601 defaults to Monday start
+        let testDate = iso8601Calendar.date(from: DateComponents(year: 2024, month: 11, day: 1))! // November 2024 with start on monday has 4 leading adjacent days and 1 trailing
         
-        let testDate = calendar.date(from: DateComponents(year: 2024, month: 11, day: 1))! // November 2024 with start on monday has 4 leading adjacent days and 1 trailing
-        
-        let leadingDates = calendar.leadingAdjacentDates(for: testDate)
+        let leadingDates = iso8601Calendar.leadingAdjacentDates(for: testDate)
         
         XCTAssertEqual(leadingDates.count, 4, "November 2024 starts on a Wednesday, so it should have 3 leading adjacent days.")
-        XCTAssertEqual(leadingDates.first, calendar.date(from: DateComponents(year: 2024, month: 10, day: 28)), "The first leading adjacent date should be October 28 (Monday), 2024.")
+        XCTAssertEqual(leadingDates.first, iso8601Calendar.date(from: DateComponents(year: 2024, month: 10, day: 28)), "The first leading adjacent date should be October 28 (Monday), 2024.")
     }
     
     func testTrailingAdjacentDates() {
-        let testDate = calendar.date(from: DateComponents(year: 2024, month: 11, day: 1))!
+        let testDate = iso8601Calendar.date(from: DateComponents(year: 2024, month: 11, day: 1))!
         
-        let trailingDates = calendar.trailingAdjacentDates(for: testDate)
+        let trailingDates = iso8601Calendar.trailingAdjacentDates(for: testDate)
         
         XCTAssertEqual(trailingDates.count, 1, "November 2024 ends on a Saturday, so it should have 2 trailing adjacent days.")
-        XCTAssertEqual(trailingDates.first, calendar.date(from: DateComponents(year: 2024, month: 12, day: 1)), "The first trailing adjacent date should be December 1, 2024.")
+        XCTAssertEqual(trailingDates.first, iso8601Calendar.date(from: DateComponents(year: 2024, month: 12, day: 1)), "The first trailing adjacent date should be December 1, 2024.")
     }
     
     func testDateGrid() {
-        let testDate = calendar.date(from: DateComponents(year: 2024, month: 11, day: 1))!
+        let testDate = iso8601Calendar.date(from: DateComponents(year: 2024, month: 11, day: 1))!
         
-        let datesInMonth = calendar.datesInMonth(for: testDate)
+        let datesInMonth = iso8601Calendar.datesInMonth(for: testDate)
         
         XCTAssertEqual(datesInMonth.count, 30, "November 2024 has 30 days.")
         XCTAssertEqual(datesInMonth.first, calendar.date(from: DateComponents(year: 2024, month: 11, day: 1)), "The first date should be November 1, 2024.")
