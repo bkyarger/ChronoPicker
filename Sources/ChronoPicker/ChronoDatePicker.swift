@@ -12,31 +12,64 @@ public struct ChronoDatePicker: View {
     
     @Environment(\.isEnabled) var isEnabled
     
+    private let mode: ChronoDatePickerMode
+    
     /// First date of the month
     @State private var currentMonth: Date
     @State private var yearMonthSelectionOpen: Bool = false
     
     @Binding var selectedDate: Date?
+    @Binding var selectedDateRange: DateRange
+    
     private let calendar: Calendar
     private let dateDisabled: ((Date) -> Bool)?
     private let showAdjacentMonthDays: Bool
     private let customDateView: ((_ date: Date, _ selected: Bool, _ adjacent: Bool) -> (AnyView))?
     
-    public init(
-        _ selectedDate: Binding<Date?>,
+    var selectedDates: [Date] {
+        switch mode {
+        case .single:
+            guard let selectedDate else { return [] }
+            return [selectedDate]
+        case .range:
+            if let startDate = selectedDateRange.startDate, let endDate = selectedDateRange.endDate {
+                return [startDate, endDate]
+            } // TODO: Implement
+            return []
+        }
+    }
+    
+    init(
+        mode: ChronoDatePickerMode,
+        selectedDate: Binding<Date?>,
+        selectedDateRange: Binding<DateRange>,
         calendar: Calendar = Calendar.current,
-        dateDisabled: ((Date) -> Bool)? = nil,
-        showAdjacentMonthDays: Bool = false,
-        customDateView: ((_ date: Date, _ selected: Bool, _ adjacent: Bool) -> (AnyView))? = nil
+        in range: (any RangeExpression<Date>)?,
+        dateDisabled: ((_ date: Date) -> Bool)?,
+        showAdjacentMonthDays: Bool,
+        customDateView: ((_ date: Date, _ selected: Bool, _ adjacent: Bool) -> (AnyView))?
     ) {
+        self.mode = mode
+        
         self._selectedDate = selectedDate
+        self._selectedDateRange = selectedDateRange
+
         self.calendar = calendar
-        self.dateDisabled = dateDisabled
+        self.dateDisabled = { date in
+            if let range {
+                return !range.contains(date)
+            }
+            if let dateDisabled {
+                return dateDisabled(date)
+            }
+            return false
+        }
         self.showAdjacentMonthDays = showAdjacentMonthDays
         
         let startOfMonth = calendar.startOfMonth(for: selectedDate.wrappedValue ?? Date())
-        self._currentMonth = State(initialValue: startOfMonth)
         self.customDateView = customDateView
+        
+        self._currentMonth = State(initialValue: startOfMonth)
     }
     
     public var body: some View {
@@ -79,64 +112,83 @@ public struct ChronoDatePicker: View {
             }
             .padding()
             
-            // MARK: Content
-            ZStack {
-                // MARK: Quickselection
-                if yearMonthSelectionOpen {
-                    let yearMonthSelection = Binding<Date>(
-                        get: { currentMonth },
-                        set: { self.currentMonth = calendar.startOfMonth(for: $0) }
-                    )
+            // MARK: Quickselection
+            if yearMonthSelectionOpen {
+                let yearMonthSelection = Binding<Date>(
+                    get: { currentMonth },
+                    set: { self.currentMonth = calendar.startOfMonth(for: $0) }
+                )
+                
+                MonthYearPicker(currentDate: yearMonthSelection)
+                    .frame(maxWidth: .infinity)
+            } else {
+                // MARK: Week days
+                WeekdayHeader(calendar: calendar)
+                
+                // MARK: Calendar
+                DateGrid(
+                    month: currentMonth,
+                    calendar: calendar,
+                    dateDisabled: dateDisabled,
+                    showAdjacentMonthDays: showAdjacentMonthDays,
+                    selectedDates: selectedDates,
+                    selectDate: selectDate
+                ) { date, adjacent in
+                    let selected = isDateSelected(date: date)
                     
-                    MonthYearPicker(currentDate: yearMonthSelection)
-                        .frame(maxWidth: .infinity)
-                } else {
-                    VStack {
-                        // MARK: Week days
-                        WeekdayHeader(calendar: calendar)
-                        
-                        // MARK: Calendar
-                        MonthView(
-                            $selectedDate,
-                            month: currentMonth,
+                    if let customDateView {
+                        AnyView(customDateView(date, selected, adjacent))
+                    } else {
+                        ChronoDateView(
+                            date: date,
                             calendar: calendar,
-                            dateDisabled: dateDisabled,
-                            showAdjacentMonthDays: showAdjacentMonthDays
-                        ) { date, selected, adjacent in
-                            Group {
-                                if let customDateView {
-                                    AnyView(customDateView(date, selected, adjacent))
-                                } else {
-                                    ChronoDateView(
-                                        date: date,
-                                        calendar: calendar,
-                                        selected: selected,
-                                        adjacent: adjacent
-                                    )
-                                }
-                            }
-                            .onTapGesture {
-                                if selected {
-                                    selectedDate = nil
-                                } else {
-                                    selectedDate = date
-                                }
-                            }
-
-                        }
+                            selected: selected,
+                            withinRange: false,
+                            adjacent: adjacent
+                        )
                     }
                 }
             }
         }
     }
     
-    // MARK: Helpers
-    
-    private func next() {
-        currentMonth = calendar.date(byAdding: .month, value: 1, to: currentMonth)!
+    private func selectDate(date: Date) {
+        switch mode {
+        case .single:
+            if let selectedDate, calendar.datesAreEqual(date1: date, date2: selectedDate) {
+                self.selectedDate = nil
+            } else {
+                selectedDate = date
+            }
+        case .range:
+            if selectedDateRange.startDate == nil {
+                self.selectedDateRange.startDate = date
+            } else if let startDate = selectedDateRange.startDate, date > startDate {
+                self.selectedDateRange.endDate = date
+            } else {
+                self.selectedDateRange.startDate = date
+                self.selectedDateRange.endDate = nil
+            }
+        }
     }
-    private func back() {
-        currentMonth = calendar.date(byAdding: .month, value: -1, to: currentMonth)!
+    
+    private func isDateSelected(date: Date) -> Bool {
+        switch mode {
+        case .single:
+            guard let selectedDate else { return false }
+            return calendar.datesAreEqual(date1: date, date2: selectedDate)
+        case .range:
+            if let startDate = selectedDateRange.startDate, let endDate = selectedDateRange.endDate {
+                let dateRange: ClosedRange = startDate...endDate
+                return dateRange.contains(date)
+            } else if let startDate = selectedDateRange.startDate {
+                return calendar.datesAreEqual(date1: date, date2: startDate)
+            } else if let endDate = selectedDateRange.endDate {
+                return calendar.datesAreEqual(date1: date, date2: endDate)
+            } else {
+                return false
+            }
+        }
     }
     
     private func monthYearString(for date: Date) -> String {
@@ -147,45 +199,55 @@ public struct ChronoDatePicker: View {
     }
 }
 
-// MARK: - Initializers
+// MARK: Navigation
+extension ChronoDatePicker {
+    private func next() {
+        currentMonth = calendar.date(byAdding: .month, value: 1, to: currentMonth)!
+    }
+    private func back() {
+        currentMonth = calendar.date(byAdding: .month, value: -1, to: currentMonth)!
+    }
+}
+
+// MARK: Initializers
 extension ChronoDatePicker {
     public init(
         _ selectedDate: Binding<Date?>,
         calendar: Calendar = Calendar.current,
-        in range: Range<Date>,
+        in range: (any RangeExpression<Date>)? = nil,
+        dateDisabled: ((_ date: Date) -> Bool)? = nil,
         showAdjacentMonthDays: Bool = false,
         customDateView: ((_ date: Date, _ selected: Bool, _ adjacent: Bool) -> (AnyView))? = nil
     ) {
-        self.init(selectedDate, calendar: calendar, dateDisabled: { date in !range.contains(date) }, showAdjacentMonthDays: showAdjacentMonthDays, customDateView: customDateView)
+        self.init(
+            mode: .single,
+            selectedDate: selectedDate,
+            selectedDateRange: Binding.constant(DateRange()),
+            calendar: calendar,
+            in: range,
+            dateDisabled: dateDisabled,
+            showAdjacentMonthDays: showAdjacentMonthDays,
+            customDateView: customDateView
+        )
     }
     
     public init(
-        _ selectedDate: Binding<Date?>,
+        _ selectedDateRange: Binding<DateRange>,
         calendar: Calendar = Calendar.current,
-        in range: PartialRangeFrom<Date>,
+        in range: (any RangeExpression<Date>)? = nil,
+        dateDisabled: ((_ date: Date) -> Bool)? = nil,
         showAdjacentMonthDays: Bool = false,
         customDateView: ((_ date: Date, _ selected: Bool, _ adjacent: Bool) -> (AnyView))? = nil
     ) {
-        self.init(selectedDate, calendar: calendar, dateDisabled: { date in !range.contains(date) }, showAdjacentMonthDays: showAdjacentMonthDays, customDateView: customDateView)
-    }
-    
-    public init(
-        _ selectedDate: Binding<Date?>,
-        calendar: Calendar = Calendar.current,
-        in range: PartialRangeUpTo<Date>,
-        showAdjacentMonthDays: Bool = false,
-        customDateView: ((_ date: Date, _ selected: Bool, _ adjacent: Bool) -> (AnyView))? = nil
-    ) {
-        self.init(selectedDate, calendar: calendar, dateDisabled: { date in !range.contains(date) }, showAdjacentMonthDays: showAdjacentMonthDays, customDateView: customDateView)
-    }
-    
-    public init(
-        _ selectedDate: Binding<Date?>,
-        calendar: Calendar = Calendar.current,
-        in range: ClosedRange<Date>,
-        showAdjacentMonthDays: Bool = false,
-        customDateView: ((_ date: Date, _ selected: Bool, _ adjacent: Bool) -> (AnyView))? = nil
-    ) {
-        self.init(selectedDate, calendar: calendar, dateDisabled: { date in !range.contains(date) }, showAdjacentMonthDays: showAdjacentMonthDays, customDateView: customDateView)
+        self.init(
+            mode: .range,
+            selectedDate: Binding.constant(nil),
+            selectedDateRange: selectedDateRange,
+            calendar: calendar,
+            in: range,
+            dateDisabled: dateDisabled,
+            showAdjacentMonthDays: showAdjacentMonthDays,
+            customDateView: customDateView
+        )
     }
 }
