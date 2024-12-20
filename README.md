@@ -88,6 +88,7 @@ struct RangePickerExample: View {
 }
 ```
 
+<img width="690" alt="image" src="https://github.com/user-attachments/assets/5ff48027-d01a-4cf5-9189-eb6a772e1089" />
 
 ### Disabled Dates
 
