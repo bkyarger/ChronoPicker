@@ -8,8 +8,34 @@ import Foundation
 import SwiftUI
 
 public struct DateRange: Equatable {
-    var startDate: Date?
-    var endDate: Date?
+    
+    private var _startDate: Date? = nil
+    private var _endDate: Date? = nil
+
+    
+    var calendar = Calendar.current
+    
+    var startDate: Date? {
+        get {
+            _startDate
+        }
+        set {
+            if let newValue {
+                self._startDate = calendar.startOfDay(for: newValue)
+            }
+        }
+    }
+    
+    var endDate: Date? {
+        get {
+            _endDate
+        }
+        set {
+            if let newValue {
+                self._endDate = calendar.startOfDay(for: newValue)
+            }
+        }
+    }
     
     public init(startDate: Date? = nil, endDate: Date? = nil) {
         self.startDate = startDate
