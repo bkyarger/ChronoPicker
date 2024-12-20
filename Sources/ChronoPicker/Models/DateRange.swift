@@ -21,11 +21,12 @@ public struct DateRange: Equatable {
             return "\(startDate.formatted(.dateTime.day().month().year())) - \(endDate.formatted(.dateTime.day().month().year()))"
         }
         if let startDate {
-            "\(startDate.formatted(.dateTime.day().month().year())) - Open End"
+            return "\(startDate.formatted(.dateTime.day().month().year())) - Open End"
         }
         
         if let endDate {
-            "Open Start - \(endDate.formatted(.dateTime.day().month().year()))"
+            // Should never be executed
+            return "Open Start - \(endDate.formatted(.dateTime.day().month().year()))"
         }
         
         return "Nothing selected"

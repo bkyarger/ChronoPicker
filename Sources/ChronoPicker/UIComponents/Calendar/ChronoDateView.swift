@@ -37,7 +37,7 @@ struct ChronoDateView: View {
         if adjacent {
             return Color.gray
         }
-        if selected || withinRange {
+        if selected || withinRange {
             return Color.black
         }
         if isToday {
