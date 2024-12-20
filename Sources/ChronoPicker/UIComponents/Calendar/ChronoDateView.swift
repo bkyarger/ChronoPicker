@@ -13,6 +13,7 @@ struct ChronoDateView: View {
     let date: Date
     let calendar: Calendar
     let selected: Bool
+    var withinRange: Bool = false
     var adjacent: Bool = false
     
     var isToday: Bool {
@@ -23,7 +24,7 @@ struct ChronoDateView: View {
         if !isEnabled {
             return .light
         }
-        if selected || isToday {
+        if withinRange || selected || isToday {
             return .semibold
         }
         return .medium
@@ -36,7 +37,7 @@ struct ChronoDateView: View {
         if adjacent {
             return Color.gray
         }
-        if selected {
+        if selected || withinRange {
             return Color.black
         }
         if isToday {
@@ -46,13 +47,25 @@ struct ChronoDateView: View {
         return Color.primary
     }
     
+    var background: Color {
+        if selected {
+            return .accentColor.opacity(0.5)
+        }
+        
+        if withinRange {
+            return .red
+        }
+        
+        return .clear
+    }
+    
     var body: some View {
         Text("\(calendar.component(.day, from: date))")
             .fontWeight(fontWeight)
             .frame(maxWidth: .infinity)
             .frame(height: 40)
             .frame(width: 40)
-            .background(selected ? Color.accentColor.opacity(0.5) : Color.clear)
+            .background(background)
             .foregroundStyle(foregroundStyle)
             .cornerRadius(20)
             .modify { view in

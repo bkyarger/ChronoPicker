@@ -15,20 +15,29 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             List {
-                NavigationLink {
-                    BasicExample()
-                } label: {
-                    Text("Basic Usage")
+                Section(header: Text("Date Picker")) {
+                    NavigationLink {
+                        BasicExample()
+                    } label: {
+                        Text("Basic Usage")
+                    }
+                    NavigationLink {
+                        DisabledDatesExample()
+                    } label: {
+                        Text("Disabled Dates")
+                    }
+                    NavigationLink {
+                        AdvancedExample()
+                    } label: {
+                        Text("Advanced Examples")
+                    }
                 }
-                NavigationLink {
-                    DisabledDatesExample()
-                } label: {
-                    Text("Disabled Dates")
-                }
-                NavigationLink {
-                    AdvancedExample()
-                } label: {
-                    Text("Advanced Examples")
+                Section(header: Text("Date Range Picker")) {
+                    NavigationLink {
+                        RangePickerExample()
+                    } label: {
+                        Text("Range Picker")
+                    }
                 }
             }
             .navigationTitle("ChronoPicker Examples")
