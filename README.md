@@ -65,6 +65,30 @@ struct ContentView: View {
 }
 ```
 
+### Date Range Ricker
+ChronoDatePicker has been updated to support date range selection, 
+allowing users to choose a start and end date in addition to single-date selection. 
+This enhancement makes it ideal for use cases like booking systems, scheduling, 
+and other applications requiring date ranges.
+
+```swift
+import SwiftUI
+import ChronoPicker
+
+struct RangePickerExample: View {
+    
+    @State private var selectedDateRange: DateRange = DateRange(startDate: Date(), endDate: Calendar.current.date(byAdding: .day, value: 4, to: Date()))
+    
+    var body: some View {
+        VStack {
+            ChronoDatePicker($selectedDateRange)
+            Text(selectedDateRange.description)
+        }
+    }
+}
+```
+
+
 ### Disabled Dates
 
 ChronoPicker's `dateDisabled` callback function offers unparalleled flexibility compared to traditional range-based disabling. While ranges are sufficient for basic use cases, the callback function allows you to define complex, dynamic rules for disabling dates.
