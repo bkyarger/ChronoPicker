@@ -9,10 +9,13 @@ import ChronoPicker
 
 struct RangePickerExample: View {
     
-    @State private var selectedDateRange: DateRange = DateRange(startDate: Date(), endDate: Calendar.current.date(byAdding: .day, value: 10, to: Date()))
+    @State private var selectedDateRange: DateRange = DateRange(startDate: Date(), endDate: Calendar.current.date(byAdding: .day, value: 4, to: Date()))
     
     var body: some View {
-        ChronoDatePicker($selectedDateRange)
+        VStack {
+            ChronoDatePicker($selectedDateRange)
+            Text(selectedDateRange.description)
+        }
     }
 }
 

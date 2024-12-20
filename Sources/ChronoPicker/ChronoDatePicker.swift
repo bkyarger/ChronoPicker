@@ -33,9 +33,18 @@ public struct ChronoDatePicker: View {
             return [selectedDate]
         case .range:
             if let startDate = selectedDateRange.startDate, let endDate = selectedDateRange.endDate {
+                // Return both dates if both are set
                 return [startDate, endDate]
-            } // TODO: Implement
+            } else if let startDate = selectedDateRange.startDate {
+                // Return just the start date if the end date is not set
+                return [startDate]
+            } else if let endDate = selectedDateRange.endDate {
+                // Return just the end date (this case might be rare)
+                return [endDate]
+            }
+            // Return an empty array if neither start nor end date is set
             return []
+            
         }
     }
     
@@ -53,7 +62,7 @@ public struct ChronoDatePicker: View {
         
         self._selectedDate = selectedDate
         self._selectedDateRange = selectedDateRange
-
+        
         self.calendar = calendar
         self.dateDisabled = { date in
             if let range {
@@ -156,17 +165,33 @@ public struct ChronoDatePicker: View {
         switch mode {
         case .single:
             if let selectedDate, calendar.datesAreEqual(date1: date, date2: selectedDate) {
+                // Deselect the date if it's already selected
                 self.selectedDate = nil
             } else {
-                selectedDate = date
+                // Select the new date
+                self.selectedDate = date
             }
+            
         case .range:
             if selectedDateRange.startDate == nil {
-                self.selectedDateRange.startDate = date
+                if let currentStartDate = selectedDateRange.startDate, calendar.isDate(currentStartDate, equalTo: date, toGranularity: .day) {
+                    self.selectedDateRange.startDate = nil
+                } else {
+                    self.selectedDateRange.startDate = date
+                }
             } else if let startDate = selectedDateRange.startDate, date > startDate {
-                self.selectedDateRange.endDate = date
+                if let currentEndDate = self.selectedDateRange.endDate, calendar.isDate(currentEndDate, equalTo: date, toGranularity: .day) {
+                    self.selectedDateRange.endDate = nil
+                } else {
+                    self.selectedDateRange.endDate = date
+                }
             } else {
-                self.selectedDateRange.startDate = date
+                // Reset the range if the conditions above aren't met
+                if let currentStartDate = selectedDateRange.startDate, calendar.isDate(currentStartDate, equalTo: date, toGranularity: .day) {
+                    self.selectedDateRange.startDate = nil
+                } else {
+                    self.selectedDateRange.startDate = date
+                }
                 self.selectedDateRange.endDate = nil
             }
         }
@@ -182,6 +207,7 @@ public struct ChronoDatePicker: View {
                 let dateRange: ClosedRange = startDate...endDate
                 return dateRange.contains(date)
             } else if let startDate = selectedDateRange.startDate {
+                print("here \(startDate.description)")
                 return calendar.datesAreEqual(date1: date, date2: startDate)
             } else if let endDate = selectedDateRange.endDate {
                 return calendar.datesAreEqual(date1: date, date2: endDate)

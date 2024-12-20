@@ -22,15 +22,15 @@ extension Calendar {
         return self.isDate(date1, equalTo: date2, toGranularity: .day)
     }
     
-    func calendarDates(in month: Date, includeAdjacent: Bool) -> [Date?] {
+    func calendarDates(in month: Date, includeAdjacent: Bool) -> [Date] {
         let datesInMonth = datesInMonth(for: month)
+        
+        if !includeAdjacent {
+            return datesInMonth
+        }
         
         let leadingAdjacentDates = self.leadingAdjacentDates(for: month)
         let trailingAdjacentDates = self.trailingAdjacentDates(for: month)
-        
-        if !includeAdjacent {
-            return Array(repeating: nil, count: leadingAdjacentDates.count) + datesInMonth + Array(repeating: nil, count: trailingAdjacentDates.count)
-        }
         
         return leadingAdjacentDates + datesInMonth + trailingAdjacentDates
     }

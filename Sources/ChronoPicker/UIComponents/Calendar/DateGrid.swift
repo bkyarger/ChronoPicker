@@ -39,25 +39,38 @@ struct DateGrid<DateView: View>: View {
     }
 
     var body: some View {
-        let dates = calendar.calendarDates(in: month, includeAdjacent: showAdjacentMonthDays)
-        
+        let datesForMonth = calendar.calendarDates(in: month, includeAdjacent: showAdjacentMonthDays)
+            
         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7)) {
             
-            ForEach(dates, id: \.self) { optionalDate in
-                if let date = optionalDate {
-                    let adjacent = calendar.component(.month, from: date) != calendar.component(.month, from: month)
-                    let selected = isDateSelected(date: date)
-                    let disabled = isDateDisabled(date: date)
-                    
-                    dateView(
-                        date,
-                        adjacent
-                    )
-                    .disabled(disabled)
-                    .onTapGesture {
-                        selectDate(date)
-                    }
-                } else {
+            if !showAdjacentMonthDays {
+                let preOffset = calendar.leadingAdjacentDates(for: month)
+                
+                ForEach(Array(preOffset), id: \.self) { _ in
+                    Text("")
+                        .frame(maxWidth: .infinity)
+                }
+            }
+            
+            ForEach(datesForMonth, id: \.self) { date in
+                let adjacent = calendar.component(.month, from: date) != calendar.component(.month, from: month)
+                let disabled = isDateDisabled(date: date)
+                
+                dateView(
+                    date,
+                    adjacent
+                )
+                .disabled(disabled)
+                .onTapGesture {
+                    selectDate(date)
+                }
+
+            }
+            
+            if !showAdjacentMonthDays {
+                let postOffset = calendar.trailingAdjacentDates(for: month)
+                
+                ForEach(Array(postOffset), id: \.self) { _ in
                     Text("")
                         .frame(maxWidth: .infinity)
                 }
@@ -65,11 +78,6 @@ struct DateGrid<DateView: View>: View {
         }
     }
 
-    
-    private func isDateSelected(date: Date) -> Bool {
-        return selectedDates.contains(date)
-    }
-    
     private func isDateDisabled(date: Date) -> Bool {
         guard let dateDisabled else {
             return false
