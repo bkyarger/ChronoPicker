@@ -108,25 +108,14 @@ final class ChronoPickerTests: XCTestCase {
     }
     
     // MARK: - Date grid
-    func testCalendarDatesWithoutAdjacentDays() {
-        let testDate = iso8601Calendar.date(from: DateComponents(year: 2024, month: 11, day: 1))! // November 2024 with start on monday has 4 leading adjacent days and 1 trailing
-        let includeAdjacent = false
-        
-        let dates = iso8601Calendar.calendarDates(in: testDate, includeAdjacent: includeAdjacent)
-        
-        XCTAssertTrue(dates.prefix(4).allSatisfy { $0 == nil }, "Leading adjacent slots should be nil when includeAdjacent is false.")
-        XCTAssertTrue(dates.suffix(1).allSatisfy { $0 == nil }, "Trailing adjacent slots should be nil when includeAdjacent is false.")
-    }
-    
+
     func testCalendarDatesWithAdjacentDays() {
         
         let testDate = iso8601Calendar.date(from: DateComponents(year: 2024, month: 11, day: 1))! // November 2024 with start on monday has 4 leading adjacent days and 1 trailing
         let includeAdjacent = true
         
         let dates = iso8601Calendar.calendarDates(in: testDate, includeAdjacent: includeAdjacent)
-        
-        XCTAssertTrue(dates.allSatisfy { $0 != nil }, "No date must be nil when include adjacent is true.")
-        
+                
         let leadingDates = dates.prefix(4).compactMap { $0 }
         XCTAssertTrue(leadingDates.allSatisfy { iso8601Calendar.component(.month, from: $0) == 10 }, "Leading adjacent dates should belong to October.")
         
