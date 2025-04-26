@@ -157,6 +157,16 @@ public struct ChronoDatePicker: View {
                         )
                     }
                 }
+                .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .local)
+                    .onEnded({ value in
+                        if value.translation.width < 0 {
+                            back()
+                        }
+                        
+                        if value.translation.width > 0 {
+                            next()
+                        }
+                    }))
             }
         }
     }

@@ -38,10 +38,10 @@ struct ChronoDateView: View {
             return Color.gray
         }
         if selected || withinRange {
-            return Color.black
+            return .white
         }
         if isToday {
-            return Color.accentColor
+            return .white
         }
         
         return Color.primary
