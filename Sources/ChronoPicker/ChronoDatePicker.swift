@@ -17,6 +17,7 @@ public struct ChronoDatePicker: View {
     /// First date of the month
     @State private var currentMonth: Date
     @State private var yearMonthSelectionOpen: Bool = false
+    @State private var offset = CGSize.zero
     
     @Binding var selectedDate: Date?
     @Binding var selectedDateRange: DateRange
@@ -155,9 +156,17 @@ public struct ChronoDatePicker: View {
                             withinRange: false,
                             adjacent: adjacent
                         )
+                        .offset(x: offset.width * 2)
+                        .transition(.opacity)
                     }
                 }
                 .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .local)
+                    .onChanged { value in
+                        self.offset = value.translation
+                    }
+                    .onEnded { value in
+                        self.offset = .zero
+                    }
                     .onEnded({ value in
                         if value.translation.width < 0 {
                             withAnimation {
@@ -170,6 +179,7 @@ public struct ChronoDatePicker: View {
                                 next()
                             }
                         }
+                        offset = CGSize.zero
                     }))
             }
         }
