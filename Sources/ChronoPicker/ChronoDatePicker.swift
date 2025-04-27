@@ -170,13 +170,13 @@ public struct ChronoDatePicker: View {
                     .onEnded({ value in
                         if value.translation.width < 0 {
                             withAnimation {
-                                back()
+                                next()
                             }
                         }
                         
                         if value.translation.width > 0 {
                             withAnimation {
-                                next()
+                                back()
                             }
                         }
                         offset = CGSize.zero
